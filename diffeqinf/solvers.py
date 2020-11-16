@@ -7,14 +7,9 @@ import scipy.interpolate
 import warnings
 
 
-class FDDenseOutput(scipy.integrate.DenseOutput):
-    def __init__(self, t_old, t, y_old):
-        super(FDDenseOutput, self).__init__(t_old, t)
-        self.y_old = y_old
-
-    def _call_impl(self, t):
-        return self.y_old[0]
-        # TODO: check/fix this
+class FDDenseOutput(scipy.integrate._ivp.base.ConstantDenseOutput):
+    #     # TODO: check/fix this
+    pass
 
 
 class ForwardEuler(scipy.integrate.OdeSolver):

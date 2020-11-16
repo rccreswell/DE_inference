@@ -66,8 +66,14 @@ class DampedOscillator(NumericalForwardModel):
         g = c / (2 * math.sqrt(m * k))
 
         def fun(t, y):
-            return [y[1],
-                    self.stimulus.__func__(t) / m - 2*g*w*y[1] - w**2 * y[0]]
+            # TODO: fix
+            try:
+                return [y[1],
+                        self.stimulus(t) / m - 2*g*w*y[1] - w**2 * y[0]]
+            except TypeError:
+                return [y[1],
+                        self.stimulus.__func__(t) / m - 2*g*w*y[1]
+                        - w**2 * y[0]]
 
         t_range = (min(times), max(times))
 

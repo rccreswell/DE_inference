@@ -30,25 +30,53 @@ class NumericalForwardModel(pints.ForwardModel):
         self.tolerance = tolerance
 
     def set_step_size(self, step_size):
+        """Update the solver step size.
+
+        Parameters
+        ----------
+        step_size : float
+            New step size
+        """
         self.step_size = step_size
 
     def set_tolerance(self, tolerance):
+        """Update the solver rtol.
+
+        Parameters
+        ----------
+        tolerance : float
+            New tolerance
+        """
         self.tolerance = tolerance
-
-    def n_parameters(self):
-        raise NotImplementedError
-
-    def simulate(self, parameters, times):
-        raise NotImplementedError
 
 
 class DampedOscillator(NumericalForwardModel):
     def __init__(self, stimulus, y0, solver, step_size=None, tolerance=None):
-        """
+        r"""Model of a damped harmonic oscillator with forcing.
+
+        The stimulus function is provided by the user. The model has three
+        parameters: spring constant :math:`k`, damping coefficient :math:`c`,
+        and mass :math:`m`.
+
+        The differential equation is given by
+
+        .. math::
+            m \frac{d^2 x}{dt^2} + c \frac{dx}{dt} + k x = F(t)
+
         Parameters
         ----------
         stimulus : function
             Input stimulus as a function of time
+        y0 : list or np.ndarry
+            Initial condition. It should have two entries, the first is
+            :math:`x(t=0)` and the second :math:`\dot{x}(t=0)`.
+        solver : str or scipy.integrate.OdeSolver
+            The ODE solver to use. Can be a string recognized by scipy or any
+            other solver.
+        step_size : float, optional (None)
+            Step size to pass to solver
+        tolerance : float, optional (None)
+            Rtol to pass to solver
         """
         super(DampedOscillator, self).__init__(
             y0, solver, step_size=step_size, tolerance=tolerance)
@@ -66,14 +94,7 @@ class DampedOscillator(NumericalForwardModel):
         g = c / (2 * math.sqrt(m * k))
 
         def fun(t, y):
-            # TODO: fix
-            try:
-                return [y[1],
-                        self.stimulus(t) / m - 2*g*w*y[1] - w**2 * y[0]]
-            except TypeError:
-                return [y[1],
-                        self.stimulus.__func__(t) / m - 2*g*w*y[1]
-                        - w**2 * y[0]]
+            return [y[1], self.stimulus(t) / m - 2*g*w*y[1] - w**2 * y[0]]
 
         t_range = (min(times), max(times))
 

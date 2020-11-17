@@ -44,17 +44,17 @@ class TestDampedOscillator(unittest.TestCase):
         cls.times = np.linspace(0, 100, 1000)
 
     def test_n_parameters(self):
-        m = diffeqinf.DampedOscillator(self.stimulus, self.y0, 'RK45')
+        m = diffeqinf.DampedOscillator(self.stimulus.__func__, self.y0, 'RK45')
         self.assertEqual(m.n_parameters(), 3)
 
     def test_simulate(self):
-        m = diffeqinf.DampedOscillator(self.stimulus, self.y0, 'RK45')
+        m = diffeqinf.DampedOscillator(self.stimulus.__func__, self.y0, 'RK45')
         m.set_tolerance(1e-5)
         y = m.simulate(self.params, self.times)
         self.assertEqual(len(y), len(self.times))
 
         m = diffeqinf.DampedOscillator(
-            self.stimulus, self.y0, diffeqinf.ForwardEuler)
+            self.stimulus.__func__, self.y0, diffeqinf.ForwardEuler)
         m.set_step_size(0.001)
         y = m.simulate(self.params, self.times)
         self.assertEqual(len(y), len(self.times))
